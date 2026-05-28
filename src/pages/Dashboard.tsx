@@ -12,7 +12,9 @@ const SEVERITY_STYLES: Record<string, string> = {
 };
 
 function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime();
+  const ts = new Date(dateStr).getTime();
+  if (!dateStr || isNaN(ts)) return '';
+  const diff = Date.now() - ts;
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return 'just now';
   if (mins < 60) return `${mins}m ago`;
@@ -44,17 +46,15 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
+    Promise.allSettled([
       dashboardService.getStats(),
       dashboardService.getRecentActivity(5),
       dashboardService.getRecentResolutions(5),
-    ])
-      .then(([s, a, r]) => {
-        setStats(s);
-        setActivity(a);
-        setResolutions(r);
-      })
-      .finally(() => setLoading(false));
+    ]).then(([statsResult, activityResult, resolutionsResult]) => {
+      if (statsResult.status === 'fulfilled') setStats(statsResult.value);
+      if (activityResult.status === 'fulfilled') setActivity(activityResult.value ?? []);
+      if (resolutionsResult.status === 'fulfilled') setResolutions(resolutionsResult.value ?? []);
+    }).finally(() => setLoading(false));
   }, []);
 
   return (
