@@ -12,4 +12,9 @@ export const Endpoint = {
   USER: {
     PROFILE: (userId: string) => `user/profile/${userId}`,
   },
+  CHAT: {
+    MESSAGE: 'chat/message',
+    SUGGESTIONS: 'chat/suggestions',
+    FEEDBACK: 'chat/feedback',
+  },
 };
