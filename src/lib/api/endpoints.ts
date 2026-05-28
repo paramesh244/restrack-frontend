@@ -26,4 +26,11 @@ export const Endpoint = {
   RESOLUTIONS: {
     LIST: 'resolutions/list',
   },
+  USERS: {
+    LIST: 'users/list',
+    INVITE: 'users/invite',
+    UPDATE: 'users/update',
+    RESET_PASSWORD: 'users/reset-password',
+    DELETE: 'users/delete',
+  },
 };
