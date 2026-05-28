@@ -17,4 +17,13 @@ export const Endpoint = {
     SUGGESTIONS: 'chat/suggestions',
     FEEDBACK: 'chat/feedback',
   },
+  DASHBOARD: {
+    STATS: 'dashboard/stats',
+  },
+  ACTIVITY: {
+    RECENT: 'activity/recent',
+  },
+  RESOLUTIONS: {
+    LIST: 'resolutions/list',
+  },
 };
