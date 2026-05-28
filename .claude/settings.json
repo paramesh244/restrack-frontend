@@ -1,0 +1,30 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "python3 .claude/hooks/check_cwd.py" }]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [{ "type": "command", "command": "python3 .claude/hooks/check_cwd.py" }]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [{ "type": "command", "command": "python3 .claude/hooks/check_cwd.py" }]
+      },
+      {
+        "matcher": "Write",
+        "hooks": [{ "type": "command", "command": "python3 .claude/hooks/check_cwd.py" }]
+      },
+      {
+        "matcher": "Grep",
+        "hooks": [{ "type": "command", "command": "python3 .claude/hooks/check_cwd.py" }]
+      },
+      {
+        "matcher": "Glob",
+        "hooks": [{ "type": "command", "command": "python3 .claude/hooks/check_cwd.py" }]
+      }
+    ]
+  }
+}
