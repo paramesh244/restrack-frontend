@@ -1,5 +1,8 @@
 import apiService from './apiService';
 import { Endpoint } from './endpoints';
+import { MOCK_STATS, MOCK_ACTIVITY, MOCK_RESOLUTIONS } from './mockData';
+
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
 export interface DashboardStats {
   total_resolutions: number;
@@ -33,6 +36,7 @@ export interface Resolution {
 
 export const dashboardService = {
   async getStats(): Promise<DashboardStats> {
+    if (USE_MOCK) return MOCK_STATS;
     const res = await apiService.get<{ data: DashboardStats }>({
       endpoint: Endpoint.DASHBOARD.STATS,
       params: {},
@@ -41,6 +45,7 @@ export const dashboardService = {
   },
 
   async getRecentActivity(limit = 5): Promise<ActivityItem[]> {
+    if (USE_MOCK) return MOCK_ACTIVITY.slice(0, limit);
     const res = await apiService.get<{ data: ActivityItem[] }>({
       endpoint: Endpoint.ACTIVITY.RECENT,
       params: { page: 1, limit },
@@ -49,6 +54,7 @@ export const dashboardService = {
   },
 
   async getRecentResolutions(limit = 5): Promise<Resolution[]> {
+    if (USE_MOCK) return MOCK_RESOLUTIONS.slice(0, limit);
     const res = await apiService.get<{ data: Resolution[] }>({
       endpoint: Endpoint.RESOLUTIONS.LIST,
       params: { page: 1, limit, sort_by: 'created_at', sort_order: 'desc' },
