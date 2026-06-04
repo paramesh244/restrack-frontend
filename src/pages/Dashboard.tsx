@@ -64,6 +64,18 @@ const Dashboard = () => {
     <AddResolution
       open={addOpen}
       onClose={() => setAddOpen(false)}
+      onCreated={() => {
+        setAddOpen(false);
+        Promise.allSettled([
+          dashboardService.getStats(),
+          dashboardService.getRecentActivity(5),
+          dashboardService.getRecentResolutions(5),
+        ]).then(([statsResult, activityResult, resolutionsResult]) => {
+          if (statsResult.status === 'fulfilled') setStats(statsResult.value);
+          if (activityResult.status === 'fulfilled') setActivity(activityResult.value ?? []);
+          if (resolutionsResult.status === 'fulfilled') setResolutions(resolutionsResult.value ?? []);
+        });
+      }}
     />
     <div className="space-y-6">
       {/* Header */}
