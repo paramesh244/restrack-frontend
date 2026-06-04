@@ -34,7 +34,28 @@ export interface Resolution {
   updated_at: string;
 }
 
+export interface CreateResolutionPayload {
+  title: string;
+  problem: string;
+  root_cause: string;
+  solution: string;
+  tags: string[];
+  hardware_reference: string;
+  firmware_version: string;
+  extra_notes: string;
+  severity: string;
+}
+
 export const dashboardService = {
+  async createResolution(payload: CreateResolutionPayload): Promise<{ id: string }> {
+    if (USE_MOCK) return { id: `mock-${Date.now()}` };
+    const res = await apiService.post<{ data: { id: string } }>({
+      endpoint: Endpoint.RESOLUTIONS.CREATE,
+      data: payload,
+    });
+    return res.data;
+  },
+
   async getStats(): Promise<DashboardStats> {
     if (USE_MOCK) return MOCK_STATS;
     const res = await apiService.get<{ data: DashboardStats }>({

@@ -25,6 +25,7 @@ export const Endpoint = {
   },
   RESOLUTIONS: {
     LIST: 'resolutions/list',
+    CREATE: 'resolutions/create',
   },
   USERS: {
     LIST: 'users/list',

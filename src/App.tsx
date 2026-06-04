@@ -13,7 +13,6 @@ import PublicRoute from '@/components/PublicRoute';
 import AppLayout from '@/components/AppLayout';
 
 import Dashboard from '@/pages/Dashboard';
-import AddResolution from '@/pages/AddResolution';
 import AIChat from '@/pages/AIChat';
 import AdminPanel from '@/pages/AdminPanel';
 import Team from '@/pages/Team';
@@ -58,7 +57,6 @@ const App = () => (
                     >
                       {/* Accessible by both Super Admin and Engineer */}
                       <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/add-resolution" element={<AddResolution />} />
                       <Route path="/ai-chat" element={<AIChat />} />
 
                       {/* Sub-page: Resolution Detail (not in nav menu) */}

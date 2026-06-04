@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FileText, TrendingUp, AlertTriangle, Tag, Clock } from 'lucide-react';
 import { dashboardService, DashboardStats, ActivityItem, Resolution } from '@/lib/api/dashboardService';
+import AddResolution from './AddResolution';
 
 const SEVERITY_STYLES: Record<string, string> = {
   CRITICAL: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
@@ -44,6 +45,7 @@ const Dashboard = () => {
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [resolutions, setResolutions] = useState<Resolution[]>([]);
   const [loading, setLoading] = useState(true);
+  const [addOpen, setAddOpen] = useState(false);
 
   useEffect(() => {
     Promise.allSettled([
@@ -58,12 +60,17 @@ const Dashboard = () => {
   }, []);
 
   return (
+    <>
+    <AddResolution
+      open={addOpen}
+      onClose={() => setAddOpen(false)}
+    />
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
         <div className="flex gap-3">
-          <Button onClick={() => navigate('/add-resolution')}>Add Resolution</Button>
+          <Button onClick={() => setAddOpen(true)}>Add Resolution</Button>
           <Button variant="outline" onClick={() => navigate('/ai-chat')}>Open Chat</Button>
         </div>
       </div>
@@ -206,6 +213,7 @@ const Dashboard = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
