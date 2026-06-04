@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { FileText, TrendingUp, AlertTriangle, Tag, Clock } from 'lucide-react';
 import { dashboardService, DashboardStats, ActivityItem, Resolution } from '@/lib/api/dashboardService';
@@ -41,11 +41,18 @@ function StatCard({ icon, label, value, sub }: { icon: React.ReactNode; label: s
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [resolutions, setResolutions] = useState<Resolution[]>([]);
   const [loading, setLoading] = useState(true);
-  const [addOpen, setAddOpen] = useState(false);
+  const [addOpen, setAddOpen] = useState(() => searchParams.get('add') === '1');
+
+  useEffect(() => {
+    if (searchParams.get('add') === '1') {
+      setSearchParams({}, { replace: true });
+    }
+  }, []);
 
   useEffect(() => {
     Promise.allSettled([

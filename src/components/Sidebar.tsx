@@ -46,7 +46,7 @@ interface NavItem {
  */
 const mainNavItems: NavItem[] = [
   { label: "Dashboard",      href: "/dashboard",      icon: LayoutDashboard, roles: ["Super Admin", "Engineer"] },
-  { label: "Add Resolution", href: "/add-resolution", icon: FilePlus,        roles: ["Super Admin", "Engineer"] },
+  { label: "Add Resolution", href: "/dashboard?add=1",  icon: FilePlus,        roles: ["Super Admin", "Engineer"] },
   { label: "AI Chat",        href: "/ai-chat",        icon: MessageSquare,   roles: ["Super Admin", "Engineer"] },
   { label: "Admin Panel",    href: "/admin",          icon: ShieldCheck,     roles: ["Super Admin"] },
 ];
