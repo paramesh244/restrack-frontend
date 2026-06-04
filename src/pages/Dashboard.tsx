@@ -46,13 +46,14 @@ const Dashboard = () => {
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [resolutions, setResolutions] = useState<Resolution[]>([]);
   const [loading, setLoading] = useState(true);
-  const [addOpen, setAddOpen] = useState(() => searchParams.get('add') === '1');
+  const [addOpen, setAddOpen] = useState(false);
 
   useEffect(() => {
     if (searchParams.get('add') === '1') {
+      setAddOpen(true);
       setSearchParams({}, { replace: true });
     }
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     Promise.allSettled([
