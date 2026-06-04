@@ -82,4 +82,34 @@ export const dashboardService = {
     });
     return res.data;
   },
+
+  async getResolutions(params: { page?: number; limit?: number; search?: string; severity?: string } = {}): Promise<{ data: Resolution[]; total: number }> {
+    if (USE_MOCK) {
+      let results = [...MOCK_RESOLUTIONS];
+      if (params.search) {
+        const q = params.search.toLowerCase();
+        results = results.filter((r) =>
+          r.title.toLowerCase().includes(q) ||
+          r.tags.some((t) => t.toLowerCase().includes(q)) ||
+          r.hardware_reference.toLowerCase().includes(q)
+        );
+      }
+      if (params.severity) {
+        results = results.filter((r) => r.severity === params.severity);
+      }
+      return { data: results, total: results.length };
+    }
+    const res = await apiService.get<{ data: Resolution[]; total: number }>({
+      endpoint: Endpoint.RESOLUTIONS.LIST,
+      params: {
+        page: params.page ?? 1,
+        limit: params.limit ?? 20,
+        sort_by: 'created_at',
+        sort_order: 'desc',
+        ...(params.search ? { search: params.search } : {}),
+        ...(params.severity ? { severity: params.severity } : {}),
+      },
+    });
+    return res;
+  },
 };

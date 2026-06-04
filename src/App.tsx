@@ -17,6 +17,7 @@ import AIChat from '@/pages/AIChat';
 import AdminPanel from '@/pages/AdminPanel';
 import Team from '@/pages/Team';
 import Settings from '@/pages/Settings';
+import Resolutions from '@/pages/Resolutions';
 import ResolutionDetail from '@/pages/ResolutionDetail';
 
 import Login from '@/pages/Login';
@@ -57,10 +58,9 @@ const App = () => (
                     >
                       {/* Accessible by both Super Admin and Engineer */}
                       <Route path="/dashboard" element={<Dashboard />} />
-                      <Route path="/ai-chat" element={<AIChat />} />
-
-                      {/* Sub-page: Resolution Detail (not in nav menu) */}
+                      <Route path="/resolutions" element={<Resolutions />} />
                       <Route path="/resolutions/:resolutionId" element={<ResolutionDetail />} />
+                      <Route path="/ai-chat" element={<AIChat />} />
 
                       {/* Super Admin only routes */}
                       <Route
