@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,12 +17,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { dashboardService, CreateResolutionPayload } from '@/lib/api/dashboardService';
+import { dashboardService, CreateResolutionPayload, ResolutionFull } from '@/lib/api/dashboardService';
 
 interface AddResolutionProps {
   open: boolean;
   onClose: () => void;
   onCreated?: (id: string) => void;
+  editData?: ResolutionFull;
+  onUpdated?: () => void;
 }
 
 const SEVERITY_OPTIONS = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'];
@@ -39,11 +41,34 @@ const empty: CreateResolutionPayload = {
   severity: '',
 };
 
-const AddResolution = ({ open, onClose, onCreated }: AddResolutionProps) => {
+const AddResolution = ({ open, onClose, onCreated, editData, onUpdated }: AddResolutionProps) => {
   const [form, setForm] = useState<CreateResolutionPayload>(empty);
   const [tagsInput, setTagsInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  const isEdit = !!editData;
+
+  useEffect(() => {
+    if (editData) {
+      setForm({
+        title: editData.title,
+        problem: editData.problem,
+        root_cause: editData.root_cause,
+        solution: editData.solution,
+        tags: editData.tags,
+        hardware_reference: editData.hardware_reference,
+        firmware_version: editData.firmware_version,
+        extra_notes: editData.extra_notes,
+        severity: editData.severity,
+      });
+      setTagsInput(editData.tags.join(', '));
+    } else {
+      setForm(empty);
+      setTagsInput('');
+    }
+    setError('');
+  }, [editData, open]);
 
   const set = (field: keyof CreateResolutionPayload, value: string) =>
     setForm((f) => ({ ...f, [field]: value }));
@@ -66,11 +91,19 @@ const AddResolution = ({ open, onClose, onCreated }: AddResolutionProps) => {
         .split(',')
         .map((t) => t.trim())
         .filter(Boolean);
-      const result = await dashboardService.createResolution({ ...form, tags });
-      onCreated?.(result.id);
-      handleClose();
+      const payload = { ...form, tags };
+
+      if (isEdit && editData) {
+        await dashboardService.updateResolution(editData.id, payload);
+        onUpdated?.();
+        handleClose();
+      } else {
+        const result = await dashboardService.createResolution(payload);
+        onCreated?.(result.id);
+        handleClose();
+      }
     } catch {
-      setError('Failed to save resolution. Please try again.');
+      setError(`Failed to ${isEdit ? 'update' : 'save'} resolution. Please try again.`);
     } finally {
       setSaving(false);
     }
@@ -80,7 +113,7 @@ const AddResolution = ({ open, onClose, onCreated }: AddResolutionProps) => {
     <Dialog open={open} onOpenChange={(v) => { if (!v) handleClose(); }}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add Resolution</DialogTitle>
+          <DialogTitle>{isEdit ? 'Edit Resolution' : 'Add Resolution'}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 py-2">
@@ -191,7 +224,7 @@ const AddResolution = ({ open, onClose, onCreated }: AddResolutionProps) => {
               Cancel
             </Button>
             <Button type="submit" disabled={saving}>
-              {saving ? 'Saving…' : 'Save Resolution'}
+              {saving ? (isEdit ? 'Saving…' : 'Saving…') : (isEdit ? 'Save Changes' : 'Save Resolution')}
             </Button>
           </DialogFooter>
         </form>

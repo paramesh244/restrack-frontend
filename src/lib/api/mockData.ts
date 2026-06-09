@@ -1,4 +1,4 @@
-import type { DashboardStats, ActivityItem, Resolution } from './dashboardService';
+import type { DashboardStats, ActivityItem, ResolutionFull } from './dashboardService';
 import type { User, UserListResponse } from './userService';
 import type { ChatMessageResponse, ChatSuggestion } from './chatService';
 
@@ -9,7 +9,7 @@ export const MOCK_STATS: DashboardStats = {
   open_issues: 7,
 };
 
-export const MOCK_RESOLUTIONS: Resolution[] = [
+export const MOCK_RESOLUTIONS: ResolutionFull[] = [
   {
     id: 'res-001',
     title: 'MCU boot failure after firmware v3.2.1 flash',
@@ -17,6 +17,10 @@ export const MOCK_RESOLUTIONS: Resolution[] = [
     tags: ['firmware', 'MCU', 'boot'],
     hardware_reference: 'HW-REV-4B',
     firmware_version: 'v3.2.1',
+    problem: 'MCU fails to boot after flashing firmware v3.2.1. The device enters an infinite reset loop and the boot LED blinks in an error pattern.',
+    root_cause: 'Misaligned vector table offset in the linker script. The FLASH_APP_START address was not updated when the bootloader partition size changed.',
+    solution: 'Updated FLASH_APP_START to 0x08010000 in linker.ld to match the new bootloader partition layout. Re-flashed the firmware and confirmed stable boot.',
+    extra_notes: 'All units shipped with bootloader v2.1+ are affected. Devices with bootloader v2.0 are unaffected. A field update procedure has been documented.',
     created_by: { id: 'usr-1', name: 'Arjun Mehta', email: 'arjun@chinmayfinlease.com' },
     created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString(),
@@ -28,6 +32,10 @@ export const MOCK_RESOLUTIONS: Resolution[] = [
     tags: ['hardware', 'I2C', 'sensor'],
     hardware_reference: 'HW-REV-3A',
     firmware_version: 'v3.1.8',
+    problem: 'The I2C bus becomes unresponsive during temperature sensor polling at 400 kHz, causing all I2C peripherals to stop responding.',
+    root_cause: 'Sensor held SDA low after a power glitch during a transaction, stalling the bus. The firmware had no recovery mechanism.',
+    solution: 'Added a 9-clock recovery routine triggered on I2C timeout. Reduced I2C bus speed from 400 kHz to 100 kHz for improved reliability on longer cable runs.',
+    extra_notes: 'Pull-up resistors changed from 4.7 kΩ to 2.2 kΩ on HW-REV-3B and later to improve signal integrity.',
     created_by: { id: 'usr-2', name: 'Priya Sharma', email: 'priya@chinmayfinlease.com' },
     created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
@@ -39,6 +47,10 @@ export const MOCK_RESOLUTIONS: Resolution[] = [
     tags: ['network', 'MQTT', 'connectivity'],
     hardware_reference: 'HW-REV-4A',
     firmware_version: 'v3.2.0',
+    problem: 'Device enters an aggressive MQTT reconnect loop when network quality degrades, causing excessive power consumption and server load.',
+    root_cause: 'The reconnect backoff was linear with a 1-second minimum, causing hundreds of reconnect attempts per minute on flaky networks.',
+    solution: 'Implemented exponential backoff starting at 2 seconds and capping at 5 minutes. Added jitter to prevent thundering-herd reconnects across multiple devices.',
+    extra_notes: 'Server-side rate limiting was also added as a defense-in-depth measure.',
     created_by: { id: 'usr-3', name: 'Rahul Nair', email: 'rahul@chinmayfinlease.com' },
     created_at: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 20 * 60 * 60 * 1000).toISOString(),
@@ -50,6 +62,10 @@ export const MOCK_RESOLUTIONS: Resolution[] = [
     tags: ['display', 'UI', 'power'],
     hardware_reference: 'HW-REV-2C',
     firmware_version: 'v2.9.5',
+    problem: 'The display exhibits visible flickering when brightness is set below 20% in dark mode, especially noticeable in low-light environments.',
+    root_cause: 'PWM frequency for backlight control was 250 Hz, too low for human persistence-of-vision at very low duty cycles.',
+    solution: 'Increased PWM frequency from 250 Hz to 2 kHz. Flicker is now imperceptible across all brightness levels.',
+    extra_notes: 'HW-REV-3A and later use a dedicated backlight driver IC that handles this internally.',
     created_by: { id: 'usr-1', name: 'Arjun Mehta', email: 'arjun@chinmayfinlease.com' },
     created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
@@ -61,6 +77,10 @@ export const MOCK_RESOLUTIONS: Resolution[] = [
     tags: ['firmware', 'OTA', 'network'],
     hardware_reference: 'HW-REV-4B',
     firmware_version: 'v3.1.9',
+    problem: 'OTA firmware updates consistently stall at 97% completion when the network bandwidth drops below 50 kbps, requiring a manual reboot.',
+    root_cause: 'The final OTA chunk write triggers a flash page erase that takes ~300 ms. The HTTP keep-alive timeout on the server was set to 200 ms, causing the connection to drop during the erase.',
+    solution: 'Increased server-side HTTP keep-alive timeout to 10 seconds. Added client-side retry logic that resumes from the last acknowledged chunk.',
+    extra_notes: 'A fallback to the previous firmware image is now triggered automatically after 3 failed OTA attempts.',
     created_by: { id: 'usr-4', name: 'Sneha Patel', email: 'sneha@chinmayfinlease.com' },
     created_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
@@ -72,6 +92,10 @@ export const MOCK_RESOLUTIONS: Resolution[] = [
     tags: ['BLE', 'connectivity', 'hardware'],
     hardware_reference: 'HW-REV-4A',
     firmware_version: 'v3.2.0',
+    problem: 'Bluetooth pairing fails consistently with Android 14 devices. The pairing dialog appears but times out with an "Unable to pair" error.',
+    root_cause: 'Android 14 enforces stricter GATT service caching. Our device advertised stale service UUIDs after a firmware update without clearing the GATT cache on the host.',
+    solution: 'Added a GATT service hash in the advertising packet. Android 14 detects the hash change and re-discovers services. Also added a "Forget & Re-pair" instruction to the user guide.',
+    extra_notes: 'iOS 17 and earlier Android versions are not affected. Testing coverage extended to include Android 14 in the CI device farm.',
     created_by: { id: 'usr-2', name: 'Priya Sharma', email: 'priya@chinmayfinlease.com' },
     created_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
@@ -83,6 +107,10 @@ export const MOCK_RESOLUTIONS: Resolution[] = [
     tags: ['power', 'hardware', 'stability'],
     hardware_reference: 'HW-REV-3B',
     firmware_version: 'v3.0.4',
+    problem: 'The 3.3V power rail drops to 2.9V under 3A continuous load, causing random MCU resets and peripheral brownouts.',
+    root_cause: 'Bulk decoupling capacitance near the MCU VDD pins was insufficient (10 µF total). Under high current transients, the rail drooped below the MCU\'s minimum operating voltage.',
+    solution: 'Added 100 µF bulk capacitance (2× 47 µF electrolytic) near the MCU VDD pins. Also replaced the LDO with a higher-current-rated switching regulator in HW-REV-4A.',
+    extra_notes: 'HW-REV-3B units in the field can be patched by adding a capacitor to the exposed pads on the PCB. A service bulletin has been issued.',
     created_by: { id: 'usr-3', name: 'Rahul Nair', email: 'rahul@chinmayfinlease.com' },
     created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
@@ -94,6 +122,10 @@ export const MOCK_RESOLUTIONS: Resolution[] = [
     tags: ['firmware', 'power', 'sleep'],
     hardware_reference: 'HW-REV-4B',
     firmware_version: 'v3.2.1',
+    problem: 'The hardware watchdog occasionally triggers a system reset when the device exits deep sleep mode, causing a loss of session state.',
+    root_cause: 'The watchdog was not paused before entering deep sleep. If deep sleep lasted longer than the 8-second watchdog timeout, the watchdog fired on wake-up before the firmware could pet it.',
+    solution: 'Added IWDG pause during deep sleep using the DBGMCU register. Watchdog is re-armed with a fresh window after the wake-up sequence completes.',
+    extra_notes: 'This only affects units with the IWDG enabled (production builds). Debug builds use the WWDG which behaves differently.',
     created_by: { id: 'usr-4', name: 'Sneha Patel', email: 'sneha@chinmayfinlease.com' },
     created_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
     updated_at: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),

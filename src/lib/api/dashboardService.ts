@@ -6,15 +6,15 @@ const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
 const MOCK_STORAGE_KEY = 'restrack_mock_resolutions';
 
-function loadMockResolutions(): Resolution[] {
+function loadMockResolutions(): ResolutionFull[] {
   try {
     const raw = localStorage.getItem(MOCK_STORAGE_KEY);
-    if (raw) return JSON.parse(raw) as Resolution[];
+    if (raw) return JSON.parse(raw) as ResolutionFull[];
   } catch { /* ignore */ }
   return [...MOCK_RESOLUTIONS];
 }
 
-function saveMockResolutions(list: Resolution[]): void {
+function saveMockResolutions(list: ResolutionFull[]): void {
   localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(list));
 }
 
@@ -48,6 +48,13 @@ export interface Resolution {
   updated_at: string;
 }
 
+export interface ResolutionFull extends Resolution {
+  problem: string;
+  root_cause: string;
+  solution: string;
+  extra_notes: string;
+}
+
 export interface CreateResolutionPayload {
   title: string;
   problem: string;
@@ -72,6 +79,10 @@ export const dashboardService = {
         tags: payload.tags,
         hardware_reference: payload.hardware_reference,
         firmware_version: payload.firmware_version,
+        problem: payload.problem,
+        root_cause: payload.root_cause,
+        solution: payload.solution,
+        extra_notes: payload.extra_notes,
         created_by: { id: 'usr-1', name: 'You', email: '' },
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
@@ -141,5 +152,58 @@ export const dashboardService = {
       },
     });
     return res;
+  },
+
+  async getResolutionById(id: string): Promise<ResolutionFull> {
+    if (USE_MOCK) {
+      const list = loadMockResolutions();
+      const found = list.find((r) => r.id === id);
+      if (!found) throw new Error('Resolution not found');
+      return found;
+    }
+    const res = await apiService.get<{ data: ResolutionFull }>({
+      endpoint: Endpoint.RESOLUTIONS.GET(id),
+      params: {},
+    });
+    return res.data;
+  },
+
+  async updateResolution(id: string, payload: CreateResolutionPayload): Promise<void> {
+    if (USE_MOCK) {
+      const list = loadMockResolutions();
+      const idx = list.findIndex((r) => r.id === id);
+      if (idx === -1) throw new Error('Resolution not found');
+      list[idx] = {
+        ...list[idx],
+        title: payload.title,
+        severity: payload.severity,
+        tags: payload.tags,
+        hardware_reference: payload.hardware_reference,
+        firmware_version: payload.firmware_version,
+        problem: payload.problem,
+        root_cause: payload.root_cause,
+        solution: payload.solution,
+        extra_notes: payload.extra_notes,
+        updated_at: new Date().toISOString(),
+      };
+      saveMockResolutions(list);
+      return;
+    }
+    await apiService.put<void>({
+      endpoint: Endpoint.RESOLUTIONS.UPDATE(id),
+      data: payload,
+    });
+  },
+
+  async deleteResolution(id: string): Promise<void> {
+    if (USE_MOCK) {
+      const list = loadMockResolutions().filter((r) => r.id !== id);
+      saveMockResolutions(list);
+      return;
+    }
+    await apiService.delete<void>({
+      endpoint: Endpoint.RESOLUTIONS.DELETE(id),
+      data: {},
+    });
   },
 };

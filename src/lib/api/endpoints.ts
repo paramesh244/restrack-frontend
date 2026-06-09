@@ -26,6 +26,9 @@ export const Endpoint = {
   RESOLUTIONS: {
     LIST: 'resolutions/list',
     CREATE: 'resolutions/create',
+    GET: (id: string) => `resolutions/${id}`,
+    UPDATE: (id: string) => `resolutions/${id}`,
+    DELETE: (id: string) => `resolutions/${id}`,
   },
   USERS: {
     LIST: 'users/list',
