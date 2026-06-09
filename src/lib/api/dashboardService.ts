@@ -4,6 +4,20 @@ import { MOCK_STATS, MOCK_ACTIVITY, MOCK_RESOLUTIONS } from './mockData';
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
 
+const MOCK_STORAGE_KEY = 'restrack_mock_resolutions';
+
+function loadMockResolutions(): Resolution[] {
+  try {
+    const raw = localStorage.getItem(MOCK_STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as Resolution[];
+  } catch { /* ignore */ }
+  return [...MOCK_RESOLUTIONS];
+}
+
+function saveMockResolutions(list: Resolution[]): void {
+  localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(list));
+}
+
 export interface DashboardStats {
   total_resolutions: number;
   resolutions_this_month: number;
@@ -48,7 +62,23 @@ export interface CreateResolutionPayload {
 
 export const dashboardService = {
   async createResolution(payload: CreateResolutionPayload): Promise<{ id: string }> {
-    if (USE_MOCK) return { id: `mock-${Date.now()}` };
+    if (USE_MOCK) {
+      const id = `mock-${Date.now()}`;
+      const list = loadMockResolutions();
+      list.unshift({
+        id,
+        title: payload.title,
+        severity: payload.severity,
+        tags: payload.tags,
+        hardware_reference: payload.hardware_reference,
+        firmware_version: payload.firmware_version,
+        created_by: { id: 'usr-1', name: 'You', email: '' },
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+      saveMockResolutions(list);
+      return { id };
+    }
     const res = await apiService.post<{ data: { id: string } }>({
       endpoint: Endpoint.RESOLUTIONS.CREATE,
       data: payload,
@@ -75,7 +105,7 @@ export const dashboardService = {
   },
 
   async getRecentResolutions(limit = 5): Promise<Resolution[]> {
-    if (USE_MOCK) return MOCK_RESOLUTIONS.slice(0, limit);
+    if (USE_MOCK) return loadMockResolutions().slice(0, limit);
     const res = await apiService.get<{ data: Resolution[] }>({
       endpoint: Endpoint.RESOLUTIONS.LIST,
       params: { page: 1, limit, sort_by: 'created_at', sort_order: 'desc' },
@@ -85,7 +115,7 @@ export const dashboardService = {
 
   async getResolutions(params: { page?: number; limit?: number; search?: string; severity?: string } = {}): Promise<{ data: Resolution[]; total: number }> {
     if (USE_MOCK) {
-      let results = [...MOCK_RESOLUTIONS];
+      let results = loadMockResolutions();
       if (params.search) {
         const q = params.search.toLowerCase();
         results = results.filter((r) =>
