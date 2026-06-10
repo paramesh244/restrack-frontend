@@ -35,7 +35,7 @@ const BuiltBy = () => {
         <a href="https://projectcode.dev" target="_blank" rel="noopener noreferrer">
           <div className="bg-zinc-900 text-white px-5 pt-1.5 pb-2.5 rounded-full text-center hover:bg-zinc-800 transition-colors border border-zinc-700/50 shadow-xl">
             <span className="text-[9px] uppercase tracking-wider opacity-70">Built with</span>
-            <span className="block text-xs font-medium">Projectcode</span>
+            <span className="block text-xs font-medium">myself</span>
           </div>
         </a>
         <CloseButton onClick={() => setShowPrompt(!showPrompt)} />
