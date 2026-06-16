@@ -6,6 +6,7 @@ export interface VerifyOtpPayload {
 export interface VerifyOtpResponse {
   token: string;
   user_id: string;
+  role?: string;
 }
 
 export const verifyOtpService = {

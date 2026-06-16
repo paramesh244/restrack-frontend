@@ -10,6 +10,7 @@ export interface LoginResponse {
   email: string;
   name: string;
   is_email_verified: number;
+  role?: string;
 }
 
 export const loginService = {

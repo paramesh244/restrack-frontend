@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { MockAuthProvider } from '@/contexts/MockAuthContext';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import BuiltBy from '@/components/BuiltBy';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -35,7 +34,6 @@ const App = () => (
       <CustomToastProvider>
         <ThemeProvider>
           <AuthProvider>
-            <MockAuthProvider>
               <ErrorBoundary>
                 <BrowserRouter>
                   <Routes>
@@ -98,7 +96,6 @@ const App = () => (
                   <BuiltBy />
                 </BrowserRouter>
               </ErrorBoundary>
-            </MockAuthProvider>
           </AuthProvider>
         </ThemeProvider>
       </CustomToastProvider>

@@ -43,12 +43,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const login = (newToken: string, newUser: AuthUser) => {
-    const demoRole = localStorage.getItem('demo_current_role') || 'Super Admin';
-    const userWithRole: AuthUser = { ...newUser, role: newUser.role ?? demoRole };
     localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, newToken);
-    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userWithRole));
+    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
     setToken(newToken);
-    setUser(userWithRole);
+    setUser(newUser);
   };
 
   const logout = () => {

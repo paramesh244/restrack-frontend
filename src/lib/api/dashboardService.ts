@@ -64,7 +64,7 @@ export interface CreateResolutionPayload {
   hardware_reference: string;
   firmware_version: string;
   extra_notes: string;
-  severity: string;
+  severity: string | null;
 }
 
 export const dashboardService = {

@@ -1,6 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMockAuth, AppRole } from '@/contexts/MockAuthContext';
+import type { AppRole } from '@/types/auth';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -8,14 +8,14 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute = ({ children, requiredRoles }: ProtectedRouteProps) => {
-  const { isAuthenticated } = useAuth();
-  const { role } = useMockAuth();
+  const { isAuthenticated, user } = useAuth();
+  const role = user?.role as AppRole | undefined;
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRoles && !requiredRoles.includes(role)) {
+  if (requiredRoles && (!role || !requiredRoles.includes(role))) {
     return <Navigate to="/dashboard" replace />;
   }
 

@@ -26,7 +26,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
@@ -40,6 +40,7 @@ const Login = () => {
           email: response.email,
           name: response.name || '',
           is_email_verified: response.is_email_verified ?? 1,
+          role: response.role ?? null,
         };
         login(response.token, userData);
         // If email not verified, redirect to OTP verification
@@ -134,29 +135,6 @@ const Login = () => {
               </Button>
             </form>
 
-            <div className="mt-6 p-3 rounded-md bg-muted border border-border text-sm">
-              <p className="font-medium mb-2 text-muted-foreground">Demo Credentials</p>
-              <div className="flex flex-wrap gap-2">
-                {([
-                  { role: 'Super Admin', email: 'superadmin@demo.com' },
-                  { role: 'Engineer', email: 'engineer@demo.com' },
-                ] as const).map(({ role, email }) => (
-                  <Button
-                    key={role}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setValue('email', email);
-                      setValue('password', 'Demo@1234');
-                      localStorage.setItem('demo_current_role', role);
-                    }}
-                  >
-                    {role}
-                  </Button>
-                ))}
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>

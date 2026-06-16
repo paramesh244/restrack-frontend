@@ -38,7 +38,7 @@ const empty: CreateResolutionPayload = {
   hardware_reference: '',
   firmware_version: '',
   extra_notes: '',
-  severity: '',
+  severity: null,
 };
 
 const AddResolution = ({ open, onClose, onCreated, editData, onUpdated }: AddResolutionProps) => {

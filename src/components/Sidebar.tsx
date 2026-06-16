@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useMockAuth, AppRole } from "@/contexts/MockAuthContext";
+import type { AppRole } from "@/types/auth";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,12 +38,6 @@ interface NavItem {
   roles: AppRole[];
 }
 
-/*
- * TODO: Real API binding
- * import { apiService } from '@/lib/api';
- * const response = await apiService.get({ endpoint: '/auth/me' });
- * Replace useMockAuth().role with response.data.role for real role-based nav filtering.
- */
 const mainNavItems: NavItem[] = [
   { label: "Dashboard",      href: "/dashboard",      icon: LayoutDashboard, roles: ["Super Admin", "Engineer"] },
   { label: "Resolutions",    href: "/resolutions",    icon: FileText,        roles: ["Super Admin", "Engineer"] },
@@ -63,8 +57,7 @@ function NavContent({
   const location = useLocation();
   const { themeMode, setThemeMode } = useTheme();
   const { user, logout } = useAuth();
-  const { role: mockRole } = useMockAuth();
-  const role: AppRole = (user?.role as AppRole) || mockRole;
+  const role = user?.role as AppRole | undefined;
   const isDark = themeMode === "dark";
 
   const navLinkClass = (href: string) => {
@@ -79,8 +72,8 @@ function NavContent({
     );
   };
 
-  const visibleMain = mainNavItems.filter((item) => item.roles.includes(role));
-  const visibleFooter = footerNavItems.filter((item) => item.roles.includes(role));
+  const visibleMain = mainNavItems.filter((item) => (role ? item.roles.includes(role) : false));
+  const visibleFooter = footerNavItems.filter((item) => (role ? item.roles.includes(role) : false));
 
   return (
     <>

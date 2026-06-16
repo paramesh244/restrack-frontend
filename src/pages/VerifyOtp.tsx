@@ -49,6 +49,7 @@ const VerifyOtp = () => {
           email,
           name,
           is_email_verified: 1,
+          role: response.role ?? null,
         });
         navigate('/dashboard');
       }
